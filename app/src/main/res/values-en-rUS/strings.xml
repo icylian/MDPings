@@ -10,7 +10,7 @@
     <string name="error_serialization">Error parsing server information</string>
 
     // Main Activity
-    <string name="app_name">MDPings</string>
+    <string name="app_name">MDPingsL</string>
     <string name="appbar_title_login">Instance List</string>
     <string name="appbar_title_appsettings">Settings</string>
     <string name="appbar_title_about">About</string>

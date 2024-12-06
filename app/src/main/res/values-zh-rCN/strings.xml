@@ -10,7 +10,7 @@
     <string name="error_serialization">解析服务器信息时发生了错误</string>
 
     // mainActivity
-    <string name="app_name">MDPings</string>
+    <string name="app_name">MDPingsL</string>
     <string name="appbar_title_login">实例列表</string>
     <string name="appbar_title_appsettings">设置</string>
     <string name="appbar_title_about">关于</string>

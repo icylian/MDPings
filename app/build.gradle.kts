@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "com.sekusarisu.mdpings"
+    namespace = "com.sekusarisu.mdpings_v0"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.sekusarisu.mdpings"
+        applicationId = "com.sekusarisu.mdpings_v0"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.4L"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
