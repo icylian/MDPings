@@ -66,7 +66,7 @@ fun ServerTitleBlock(
             )
         },
         shape = ShapeDefaults.Large,
-        selected = true,
+        selected = false,
         onClick = {
             scope.launch {
                 onAction(
@@ -90,7 +90,8 @@ fun ServerTitleBlock(
                     modifier = Modifier.weight(1f)
                 )
             }
-        }
+        },
+        border = null
     )
 }
 

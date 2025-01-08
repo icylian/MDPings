@@ -97,7 +97,7 @@ fun NewServerListCard(
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
-            NewServerTitle(
+            ServerTitleBlock(
                 serverUi = serverUi,
                 onAction = onAction,
                 onNavigateToDetail = onNavigateToDetail
@@ -120,7 +120,7 @@ fun NewServerCardPreview() {
                 isExpanded = true
             )
             Spacer(Modifier.height(8.dp))
-            ServerListCard(
+            NewServerListCard(
                 serverUi = previewWSServerUi1,
                 onAction = {},
                 modifier = Modifier,
@@ -128,7 +128,7 @@ fun NewServerCardPreview() {
                 isExpanded = true
             )
             Spacer(Modifier.height(8.dp))
-            ServerListCard(
+            NewServerListCard(
                 serverUi = previewWSServerUi0,
                 onAction = {},
                 modifier = Modifier,
