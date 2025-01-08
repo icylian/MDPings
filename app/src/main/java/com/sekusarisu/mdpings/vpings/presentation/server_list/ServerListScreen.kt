@@ -41,7 +41,6 @@ import com.sekusarisu.mdpings.vpings.presentation.app_settings.AppSettingsAction
 import com.sekusarisu.mdpings.vpings.presentation.app_settings.AppSettingsState
 import com.sekusarisu.mdpings.vpings.presentation.models.WSServerUi
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.NewServerListCard
-import com.sekusarisu.mdpings.vpings.presentation.server_list.components.ServerListCard
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.ServerSummaryCard
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.previewListWSServers
 import kotlinx.coroutines.delay

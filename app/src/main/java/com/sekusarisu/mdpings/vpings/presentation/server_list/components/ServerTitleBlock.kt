@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.sekusarisu.mdpings.ui.theme.MDPingsTheme
-import com.sekusarisu.mdpings.vpings.presentation.models.ServerUi
 import com.sekusarisu.mdpings.vpings.presentation.models.WSServerUi
 import com.sekusarisu.mdpings.vpings.presentation.server_list.ServerListAction
 import kotlinx.coroutines.launch
@@ -40,7 +39,7 @@ fun ServerTitleBlock(
             selectedContainerColor =
             if (serverUi.isOnline) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer,
-            selectedLabelColor =
+            labelColor =
             if (serverUi.isOnline) MaterialTheme.colorScheme.onSurface
             else MaterialTheme.colorScheme.error,
         ),
