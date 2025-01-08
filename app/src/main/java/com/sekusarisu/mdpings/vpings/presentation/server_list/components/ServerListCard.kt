@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -499,19 +500,6 @@ fun NetworkIO(server: WSServerUi) {
     }
 }
 
-@Composable
-fun NetworkIOCollapse(
-    modifier: Modifier = Modifier,
-    server: ServerUi
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-
-    }
-}
-
 // Preview Data
 @PreviewLightDark
 @Composable
@@ -550,6 +538,7 @@ private fun previewHostUi(): HostUi {
         platform = "ubuntu",
         platformVersion = "22.04",
         cpu = "Cortex-A55 8 Physical Core\nCortex-A76 8 Physical Core",
+        core = 16,
         memTotal = 8323002368,
         diskTotal = 2164154892288,
         swapTotal = 267362304,
@@ -569,6 +558,7 @@ private fun previewWSHostUi(): WSHostUi {
         platform = "ubuntu",
         platformVersion = "22.04",
         cpu = "Cortex-A55 8 Physical Core\nCortex-A76 8 Physical Core",
+        core = 16,
         memTotal = 8323002368,
         diskTotal = 2164154892288,
         swapTotal = 267362304,
@@ -672,7 +662,10 @@ internal val previewWSServerUi3 = WSServerUi(
     name = "Server3",
     host = previewWSHostUi(),
     status = previewWSStatusUi(),
-    countryCode = "cn",
+    countryCode = listOf<String>(
+        "hk", "nl", "us", "cn", "jp", "tw"
+    )[Random.nextInt(until = 6)]
+        .countryCodeCheck().toCountryCodeToEmojiFlag(),
     lastActive = "2024-12-02T08:39:18.976038437Z",
     isOnline = true,
     displayIndex = 0

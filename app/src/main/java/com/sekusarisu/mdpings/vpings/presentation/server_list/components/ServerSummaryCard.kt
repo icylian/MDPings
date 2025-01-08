@@ -300,9 +300,9 @@ fun OutlinedCardTransferredCount(
                     label = "AnimatedNetworkIn",
                     transitionSpec = {
                         fadeIn() + slideInVertically(
-                            animationSpec = tween(1000),
+                            animationSpec = tween(250),
                             initialOffsetY = { fullHeight -> fullHeight }
-                        ) togetherWith fadeOut(animationSpec = tween(200))
+                        ) togetherWith fadeOut(animationSpec = tween(250))
                     },
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
@@ -327,9 +327,9 @@ fun OutlinedCardTransferredCount(
                     label = "AnimatedNetworkIn",
                     transitionSpec = {
                         fadeIn() + slideInVertically(
-                            animationSpec = tween(1000),
+                            animationSpec = tween(250),
                             initialOffsetY = { fullHeight -> fullHeight }
-                        ) togetherWith fadeOut(animationSpec = tween(200))
+                        ) togetherWith fadeOut(animationSpec = tween(250))
                     },
                     modifier = Modifier
                         .padding(horizontal = 4.dp)

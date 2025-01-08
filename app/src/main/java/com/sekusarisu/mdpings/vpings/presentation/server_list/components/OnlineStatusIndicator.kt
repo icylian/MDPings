@@ -98,7 +98,7 @@ fun OnlineStatusIndicator(
             Text(
                 textAlign = TextAlign.Center,
                 text =
-                    if (showOnlineOrDays == "Days") "${uptime / 86400} Days"
+                    if (showOnlineOrDays == "Days") "${uptime / 86400}d"
                     else "ONLINE",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,

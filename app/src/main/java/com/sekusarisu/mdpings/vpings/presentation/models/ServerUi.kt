@@ -28,6 +28,7 @@ data class HostUi(
     val platform: String,
     val platformVersion: String,
     val cpu: String,
+    val core: Int,
     val memTotal: Long,
     val diskTotal: Long,
     val swapTotal: Long,
@@ -82,6 +83,7 @@ private fun Host.toHostUi(): HostUi {
         platform = platform,
         platformVersion = platformVersion,
         cpu = cpu?.joinToString("\n") ?: "N/A",
+        core = cpu?.extractLastNumberAndSum() ?: 0,
         memTotal = memTotal,
         diskTotal = diskTotal,
         swapTotal = swapTotal,
@@ -112,6 +114,28 @@ private fun Status.toStatusUi(): StatusUi {
         processCount = processCount,
         gpu = gpu
     )
+}
+
+fun List<String>.extractLastNumberAndSum(): Int {
+    /**
+     * 从核心列表中提取每个字符串最后出现的数字并求和
+     *
+     * @param coreList 包含核心描述的字符串列表
+     * @return 所有提取出的数字的总和
+     */
+
+    fun extractLastNumber(text: String): Int {
+        // 使用正则表达式匹配所有数字
+        val numbers = "\\d+".toRegex().findAll(text)
+            .map { it.value.toInt() }
+            .toList()
+
+        // 如果找到数字，返回最后一个数字，否则返回0
+        return numbers.lastOrNull() ?: 0
+    }
+
+    // 使用 sumOf 对每个字符串提取数字并求和
+    return this.sumOf { extractLastNumber(it) }
 }
 
 fun String.countryCodeCheck(): String {

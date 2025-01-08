@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WSServersResponsesDto(
     val now: Long = 1000000000000,
+    val online: Int = 1,
     val servers: List<WSServerDto> = emptyList<WSServerDto>()
 )
 
