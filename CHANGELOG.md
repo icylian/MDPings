@@ -1,5 +1,11 @@
 
-### v1.1.5
+### v1.1.7
+
+- Fix: Loading server loop (v1.4.x online count).
+
+- Init: New server list card.
+
+### v1.1.6
 
 - Add: Swipeable TabRow.
 
