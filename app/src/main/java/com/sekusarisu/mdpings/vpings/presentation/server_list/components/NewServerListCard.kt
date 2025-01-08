@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,7 +38,7 @@ fun NewServerListCard(
     val scope = rememberCoroutineScope()
 
     if (serverUi.isOnline) {
-        Card(
+        OutlinedCard(
             onClick = {
                 scope.launch {
                     onAction(
@@ -51,7 +52,7 @@ fun NewServerListCard(
             modifier = modifier.wrapContentHeight(),
             shape = ShapeDefaults.Medium,
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+//            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             ServerTitleBlock(
                 serverUi = serverUi,
@@ -93,8 +94,8 @@ fun NewServerListCard(
         Card(
             modifier = modifier.wrapContentHeight(),
             shape = ShapeDefaults.Medium,
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.errorContainer),
+//            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             ServerTitleBlock(
                 serverUi = serverUi,

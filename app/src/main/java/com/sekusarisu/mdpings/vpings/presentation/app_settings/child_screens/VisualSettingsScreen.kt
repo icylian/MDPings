@@ -58,6 +58,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.ui.platform.LocalContext
 import com.sekusarisu.mdpings.vpings.presentation.app_settings.components.AppSettingsSwitch
+import com.sekusarisu.mdpings.vpings.presentation.server_list.components.NewServerListCard
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.previewWSServerUi0
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.previewWSServerUi1
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.previewWSServerUi2
@@ -172,7 +173,7 @@ fun VisualSettingsScreen(
         Column(
             modifier = Modifier.padding(horizontal = 8.dp)
         ) {
-            ServerListCard(
+            NewServerListCard(
                 serverUi = previewWSServerUi0,
                 onAction = {},
                 modifier = Modifier,
@@ -180,7 +181,7 @@ fun VisualSettingsScreen(
                 isExpanded = true
             )
             Spacer(Modifier.height(8.dp))
-            ServerListCard(
+            NewServerListCard(
                 serverUi = previewWSServerUi1,
                 onAction = {},
                 modifier = Modifier,
@@ -188,7 +189,7 @@ fun VisualSettingsScreen(
                 isExpanded = true
             )
             Spacer(Modifier.height(8.dp))
-            ServerListCard(
+            NewServerListCard(
                 serverUi = previewWSServerUi2,
                 onAction = {},
                 modifier = Modifier,

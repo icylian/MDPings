@@ -62,11 +62,11 @@ fun ServerSummaryCard(
     onAction: (ServerListAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    OutlinedCard(
         modifier = modifier.heightIn(max = 240.dp),
         shape = ShapeDefaults.Medium,
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
