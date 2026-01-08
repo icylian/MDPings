@@ -1,4 +1,8 @@
 
+### v1.2.0
+
+- Init: Xterm.js ssh terminal.
+
 ### v1.1.7
 
 - Fix: Loading server loop (v1.4.x online count).

@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.sekusarisu.mdpings"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.sekusarisu.mdpings"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 13
-        versionName = "1.1.7"
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -45,11 +45,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        jvmToolchain(11)
     }
     buildFeatures {
         buildConfig = true

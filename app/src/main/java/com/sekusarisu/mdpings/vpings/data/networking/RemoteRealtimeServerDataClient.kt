@@ -1,6 +1,5 @@
 package com.sekusarisu.mdpings.vpings.data.networking
 
-import androidx.compose.ui.text.AnnotatedString
 import com.sekusarisu.mdpings.core.data.networking.constructUrl
 import com.sekusarisu.mdpings.core.data.networking.constructWSUrl
 import com.sekusarisu.mdpings.core.data.networking.safeCall
@@ -118,7 +117,7 @@ class RemoteRealtimeServerDataClient(
     override suspend fun getServerTerminalStream(
         baseUrl: String,
         sessionId: String
-    ): Flow<AnnotatedString> = channelFlow {
+    ): Flow<String> = channelFlow {
         val wsUrl = constructWSUrl(
             baseURL = baseUrl,
             url = "/api/v1/ws/terminal/${sessionId}"
@@ -132,7 +131,7 @@ class RemoteRealtimeServerDataClient(
                 when (frame) {
                     is Frame.Binary -> {
                         try {
-                            val frameText = frame.decodeToString().toAnsiAnnotatedString()
+                            val frameText = frame.decodeToString()
                             println("ReadText (Binary): $frameText")
                             send(frameText)
                         } catch (e: Exception) {
@@ -141,7 +140,7 @@ class RemoteRealtimeServerDataClient(
                         }
                     }
                     is Frame.Text -> {
-                        val textMessage = frame.readText().toAnsiAnnotatedString()
+                        val textMessage = frame.readText()
                         println("Received Text Message: $textMessage")
                         send(textMessage)
                     }

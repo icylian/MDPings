@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+dev.md
+.claude

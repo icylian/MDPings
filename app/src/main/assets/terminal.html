@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MDPings Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1e1e1e;
+            /* 在 WebView 中需要 position: fixed 才能获得正确的高度 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        #terminal {
+            width: 100%;
+            height: 100%;
+            background-color: #1e1e1e;
+            /* 使用 absolute 相对于 fixed 的 body */
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/lib/xterm-addon-web-links.min.js"></script>
+    <script>
+        const term = new Terminal({
+            cursorBlink: true,
+            cursorStyle: 'block',
+            fontSize: 8,
+            fontFamily: 'Consolas, "Courier New", monospace',
+            fontWeight: 'normal',
+            fontWeightBold: 'bold',
+            lineHeight: 1.2,
+            letterSpacing: 0,
+            scrollback: 1000,
+            tabStopWidth: 8,
+            theme: {
+                background: '#1e1e1e',
+                foreground: '#d4d4d4',
+                cursor: '#aeafad',
+                cursorAccent: '#1e1e1e',
+                selectionBackground: '#264f78',
+                black: '#000000',
+                red: '#cd3131',
+                green: '#0dbc79',
+                yellow: '#e5e510',
+                blue: '#2472c8',
+                magenta: '#bc3fbc',
+                cyan: '#11a8cd',
+                white: '#e5e5e5',
+                brightBlack: '#666666',
+                brightRed: '#f14c4c',
+                brightGreen: '#23d18b',
+                brightYellow: '#f5f543',
+                brightBlue: '#3b8eea',
+                brightMagenta: '#d670d6',
+                brightCyan: '#29b8db',
+                brightWhite: '#ffffff'
+            },
+            allowProposedApi: true
+        });
+
+        const fitAddon = new FitAddon.FitAddon();
+        const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+
+        term.loadAddon(fitAddon);
+        term.loadAddon(webLinksAddon);
+        term.open(document.getElementById('terminal'));
+
+        console.log('Terminal opened, container size:', document.getElementById('terminal').offsetWidth, 'x', document.getElementById('terminal').offsetHeight);
+
+        // 延迟初始化，等待容器有正确的尺寸
+        let initAttempts = 0;
+        const maxAttempts = 20;
+
+        const tryInit = () => {
+            initAttempts++;
+            const container = document.getElementById('terminal');
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+
+            console.log('Init attempt', initAttempts, ':', width, 'x', height);
+
+            // 只有当容器有合理的尺寸时才初始化
+            if (height > 100 && width > 100) {
+                console.log('Container has valid size, fitting terminal');
+                fitAddon.fit();
+                console.log('Terminal fitted to:', term.cols, 'x', term.rows);
+
+                term.focus();
+
+                // 通知Android端xterm已经准备好
+                if (window.AndroidBridge && typeof window.AndroidBridge.onXtermReady === 'function') {
+                    window.AndroidBridge.onXtermReady();
+                }
+
+                // 上报初始尺寸
+                if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                    window.AndroidBridge.onResize(term.cols, term.rows);
+                }
+            } else if (initAttempts < maxAttempts) {
+                // 容器还没有尺寸，继续等待
+                console.log('Container too small, retrying...');
+                setTimeout(tryInit, 100);
+            } else {
+                console.error('Failed to initialize terminal after', maxAttempts, 'attempts');
+                // 即使失败也通知 Android，避免卡死
+                if (window.AndroidBridge && typeof window.AndroidBridge.onXtermReady === 'function') {
+                    window.AndroidBridge.onXtermReady();
+                }
+            }
+        };
+
+        // 延迟200ms后开始尝试初始化
+        setTimeout(tryInit, 200);
+
+        // 响应窗口尺寸调整
+        window.addEventListener('resize', () => {
+            console.log('Window resized, refitting terminal');
+            fitAddon.fit();
+            // 上报终端尺寸给 Android
+            if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                window.AndroidBridge.onResize(term.cols, term.rows);
+            }
+        });
+
+        // 监听终端尺寸变化
+        term.onResize(({ cols, rows }) => {
+            if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                window.AndroidBridge.onResize(cols, rows);
+            }
+        });
+
+        // 接收来自 Kotlin 的数据并写入终端
+        function writeToTerminal(data) {
+            try {
+                term.write(data);
+            } catch (e) {
+                console.error('Write error:', e);
+            }
+        }
+
+        // 接收Base64编码的数据并写入终端
+        function writeToTerminalBase64(base64Data) {
+            try {
+                // 检查用户是否已经在底部（允许一些误差）
+                var wasAtBottom = (term.buffer.active.baseY + term.rows) >= term.buffer.active.length - 2;
+
+                // 将数据转为字节数组，然后Base64解码
+                var binaryString = atob(base64Data);
+                // 转换为Uint8Array
+                var len = binaryString.length;
+                var bytes = new Uint8Array(len);
+                for (var i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                // 写入终端
+                term.write(bytes);
+
+                // 只有当用户之前就在底部时才自动滚动
+                // 这样用户可以向上滚动查看历史输出而不被打断
+                if (wasAtBottom) {
+                    term.scrollToBottom();
+                }
+
+                return true;  // 返回true表示成功
+            } catch (e) {
+                console.error('Write error:', e);
+                return false;  // 返回false表示失败
+            }
+        }
+
+        // 清空终端
+        function clearTerminal() {
+            term.clear();
+        }
+
+        // 将用户输入发送到 Kotlin
+        term.onData(data => {
+            if (window.AndroidBridge && typeof window.AndroidBridge.onData === 'function') {
+                window.AndroidBridge.onData(data);
+            }
+        });
+
+        // 暴露给 Kotlin 调用的接口
+        window.xterm = {
+            write: writeToTerminal,
+            writeBase64: writeToTerminalBase64,
+            clear: clearTerminal,
+            fit: () => {
+                fitAddon.fit();
+                if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                    window.AndroidBridge.onResize(term.cols, term.rows);
+                }
+            },
+            focus: () => term.focus(),
+            scrollToBottom: () => term.scrollToBottom(),
+            getCols: () => term.cols,
+            getRows: () => term.rows,
+            setContainerSize: (widthPx, heightPx) => {
+                console.log('setContainerSize called with:', widthPx, 'x', heightPx);
+
+                const container = document.getElementById('terminal');
+                console.log('Container current size:', container.offsetWidth, 'x', container.offsetHeight);
+
+                // 简单地触发 fit，让 fitAddon 自动读取容器尺寸
+                fitAddon.fit();
+
+                console.log('Terminal refitted to:', term.cols, 'x', term.rows);
+
+                if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                    window.AndroidBridge.onResize(term.cols, term.rows);
+                }
+            },
+            setFontSize: (size) => {
+                console.log('Setting font size to:', size);
+                term.options.fontSize = size;
+                // 重新计算终端尺寸以适应新字体
+                setTimeout(() => {
+                    fitAddon.fit();
+                    if (window.AndroidBridge && typeof window.AndroidBridge.onResize === 'function') {
+                        window.AndroidBridge.onResize(term.cols, term.rows);
+                    }
+                }, 50);
+            }
+        };
+    </script>
+</body>
+</html>

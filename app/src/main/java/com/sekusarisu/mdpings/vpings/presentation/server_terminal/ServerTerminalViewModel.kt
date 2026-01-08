@@ -1,17 +1,15 @@
 package com.sekusarisu.mdpings.vpings.presentation.server_terminal
 
-import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sekusarisu.mdpings.core.domain.util.Result
 import com.sekusarisu.mdpings.core.domain.util.onError
 import com.sekusarisu.mdpings.core.domain.util.onSuccess
-import com.sekusarisu.mdpings.vpings.data.networking.toAnsiAnnotatedString
 import com.sekusarisu.mdpings.vpings.domain.RealtimeServerDataClient
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +24,9 @@ class ServerTerminalViewModel(
             SharingStarted.WhileSubscribed(5000L),
             ServerTerminalState()
         )
+
+    private val _terminalDataFlow = MutableSharedFlow<String>()
+    val terminalDataFlow = _terminalDataFlow.asSharedFlow()
 
     private var webSocketJob: Job? = null
 
@@ -47,16 +48,27 @@ class ServerTerminalViewModel(
             is ServerTerminalAction.OnCleanScreen -> {
                 cleanScreen()
             }
+            is ServerTerminalAction.OnChangeFontSize -> {
+                changeFontSize(action.delta)
+            }
+            is ServerTerminalAction.OnToggleCtrl -> {
+                _state.update { it.copy(isCtrlPressed = !it.isCtrlPressed) }
+            }
+            is ServerTerminalAction.OnToggleAlt -> {
+                _state.update { it.copy(isAltPressed = !it.isAltPressed) }
+            }
+            is ServerTerminalAction.OnResetModifiers -> {
+                _state.update { it.copy(isCtrlPressed = false, isAltPressed = false) }
+            }
+            is ServerTerminalAction.OnSendSpecialKey -> {
+                sendSpecialKey(action.key)
+            }
         }
     }
 
     private fun cleanScreen() {
-        _state.update {
-            it.copy(
-                terminal = emptyList<AnnotatedString>()
-            )
-        }
-        sendCommand("\n")
+        // 发送清屏命令
+        sendCommand("\u000c")
     }
 
     private fun refreshToken(baseUrl: String) {
@@ -68,6 +80,7 @@ class ServerTerminalViewModel(
 
     private fun initConnection(baseUrl: String, selectedServerId: Int, connectTo: String) {
         viewModelScope.launch{
+            _state.update { it.copy(isLoading = true) }
             realtimeServerDataClient
                 .getSession(baseUrl, selectedServerId)
                 .onSuccess { result ->
@@ -75,31 +88,24 @@ class ServerTerminalViewModel(
                 }
                 .onError { error ->
                     println(error)
+                    _state.update { it.copy(isLoading = false) }
                 }
         }
     }
 
     private fun connectToTerminal(baseUrl: String, sessionId: String, connectTo: String) {
         webSocketJob?.cancel()
-        _state.update { currentState ->
-            currentState.copy(
-                terminal = listOf<AnnotatedString>(AnnotatedString("已和" + connectTo + "建立终端连接\n"))
-            )
+        _state.update { it.copy(isConnected = true, isLoading = false) }
+
+        viewModelScope.launch {
+            _terminalDataFlow.emit("已和 $connectTo 建立终端连接\r\n")
         }
+
         webSocketJob = viewModelScope.launch{
             realtimeServerDataClient
                 .getServerTerminalStream(baseUrl, sessionId)
-                .onEach {
-                    _state.update { it.copy(
-                        isLoading = false
-                    ) }
-                }
-                .collect { newTerminalMessage ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            terminal = currentState.terminal + newTerminalMessage
-                        )
-                    }
+                .collect { terminalData ->
+                    _terminalDataFlow.emit(terminalData)
                 }
         }
     }
@@ -112,15 +118,37 @@ class ServerTerminalViewModel(
 
     private fun closeSession() {
         webSocketJob?.cancel()
-        _state.update { currentState ->
-            currentState.copy(
-                terminal = currentState.terminal + listOf<AnnotatedString>(AnnotatedString("\n" + "已断开终端连接"))
-            )
-        }
+        _state.update { it.copy(isConnected = false) }
+
         viewModelScope.launch{
-            realtimeServerDataClient
-                .disconnect()
+            _terminalDataFlow.emit("\r\n已断开终端连接\r\n")
+            realtimeServerDataClient.disconnect()
         }
+    }
+
+    private fun changeFontSize(delta: Int) {
+        _state.update { currentState ->
+            val newSize = (currentState.fontSize + delta).coerceIn(8, 24)
+            currentState.copy(fontSize = newSize)
+        }
+    }
+
+    private fun sendSpecialKey(key: String) {
+        val command = when (key) {
+            "ESC" -> "\u001B"
+            "TAB" -> "\t"
+            "UP" -> "\u001B[A"
+            "DOWN" -> "\u001B[B"
+            "RIGHT" -> "\u001B[C"
+            "LEFT" -> "\u001B[D"
+            "HOME" -> "\u001B[H"
+            "END" -> "\u001B[F"
+            "PAGEUP" -> "\u001B[5~"
+            "PAGEDOWN" -> "\u001B[6~"
+            else -> return
+        }
+
+        sendCommand(command)
     }
 
 }

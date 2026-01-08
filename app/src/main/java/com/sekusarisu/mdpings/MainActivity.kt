@@ -3,6 +3,7 @@ package com.sekusarisu.mdpings
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -76,13 +77,29 @@ import com.sekusarisu.mdpings.vpings.presentation.server_terminal.ServerTerminal
 
 
 class MainActivity : ComponentActivity() {
+
+    // 音量键处理回调，可以被Screen设置
+    var onVolumeKeyPressed: ((isVolumeUp: Boolean) -> Boolean)? = null
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+                return onVolumeKeyPressed?.invoke(true) ?: false
+            }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                return onVolumeKeyPressed?.invoke(false) ?: false
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class,
         ExperimentalMaterial3WindowSizeClassApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // 移除 enableEdgeToEdge() 以修复终端键盘遮挡问题
         setContent {
 
             val appSettingsViewModel = koinViewModel<AppSettingsViewModel>()
@@ -178,8 +195,17 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
+                // 在终端页面：只有当抽屉关闭时才禁用手势
+                // 如果抽屉已打开，保持手势启用以便用户可以滑动关闭
+                val isTerminalScreen = currentRoute?.startsWith("${Screen.ServerListDetailPane.route}/") == true
+                val drawerGesturesEnabled = if (isTerminalScreen) {
+                    drawerState.isOpen  // 终端页面：打开时启用手势，关闭时禁用
+                } else {
+                    true  // 其他页面：始终启用手势
+                }
+
                 ModalNavigationDrawer(
-                    gesturesEnabled = true,
+                    gesturesEnabled = drawerGesturesEnabled,
                     drawerState = drawerState,
                     drawerContent = {
                         ModalDrawerSheet {
@@ -341,7 +367,8 @@ class MainActivity : ComponentActivity() {
                                         selectedServerId = serverId,
                                         appSettingsState = appSettingsState,
                                         onAction = serverTerminalViewModel::onAction,
-                                        modifier = Modifier
+                                        viewModel = serverTerminalViewModel,
+                                        modifier = Modifier.fillMaxSize()
                                     )
                                 }
 

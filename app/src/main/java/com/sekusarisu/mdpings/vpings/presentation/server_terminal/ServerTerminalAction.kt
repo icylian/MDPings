@@ -7,4 +7,9 @@ interface ServerTerminalAction {
     object OnDisconnect: ServerTerminalAction
     data class OnSendCommand(val command: String): ServerTerminalAction
     object OnCleanScreen: ServerTerminalAction
+    data class OnChangeFontSize(val delta: Int): ServerTerminalAction
+    object OnToggleCtrl: ServerTerminalAction
+    object OnToggleAlt: ServerTerminalAction
+    object OnResetModifiers: ServerTerminalAction
+    data class OnSendSpecialKey(val key: String): ServerTerminalAction
 }

@@ -1,6 +1,7 @@
 package com.sekusarisu.mdpings.vpings.presentation
 
 import android.content.res.Configuration
+import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -44,6 +45,8 @@ import com.sekusarisu.mdpings.vpings.presentation.server_list.components.preview
 import com.sekusarisu.mdpings.vpings.presentation.server_list.components.previewWSServerUi0
 import com.sekusarisu.mdpings.vpings.presentation.user_login.LoginAction
 import kotlinx.collections.immutable.persistentListOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.Any
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -62,6 +65,7 @@ fun ListDetailLayoutScreen(
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
 
     // 切换实例时刷新token
     LaunchedEffect(appSettingsState.appSettings.activeInstance) {
@@ -87,14 +91,16 @@ fun ListDetailLayoutScreen(
         navigator = navigator,
         listPane = {
             ServerListScreen(
-                modifier = modifier,
                 state = serverListState,
                 onAction = onServerListAction,
                 onNavigateToDetail = { serverId ->
-                    navigator.navigateTo(
-                        pane = ListDetailPaneScaffoldRole.Detail,
-                        content = serverId
-                    )
+                    // Use the scope to launch a coroutine
+                    scope.launch {
+                        navigator.navigateTo(
+                            pane = ListDetailPaneScaffoldRole.Detail,
+                            content = serverId
+                        )
+                    }
                 },
                 onLoad = onAppSettingsAction,
                 appSettingsState = appSettingsState,
