@@ -276,8 +276,8 @@ class MainActivity : ComponentActivity() {
                         NavHost(
                             navController = navController,
                             startDestination = Screen.Loading.route,
-                            // TODO 部分机型切换日夜间模式的时候会negative闪退？
-                            modifier = Modifier.padding(top = innerPadding.calculateTopPadding() - 4.dp)
+                            // Fixed: Prevent negative padding on theme change/rotation
+                            modifier = Modifier.padding(top = (innerPadding.calculateTopPadding() - 4.dp).coerceAtLeast(0.dp))
                         ) {
                             // Loading screen
                             composable(Screen.Loading.route) {

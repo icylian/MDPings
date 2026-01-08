@@ -202,12 +202,16 @@ fun ServerDetailScreen(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            // TODO 转屏的时候触发了清空wsServerUi -> java.lang.NullPointerException?
-            InstanceInfo(
-                serverUi = state.wsServerUi!!,
-                ipAPIUi = state.ipAPIUi!!,
-                modifier = modifier
-            )
+            // Fixed: Safely handle null values during rotation/disposal
+            state.wsServerUi?.let { wsServer ->
+                state.ipAPIUi?.let { ipApi ->
+                    InstanceInfo(
+                        serverUi = wsServer,
+                        ipAPIUi = ipApi,
+                        modifier = modifier
+                    )
+                }
+            }
             Spacer(Modifier.height(8.dp))
 
             // monitors 没数据就不显示 NetworkMonitor 跟 PktLostAndAvgLatencyCard
