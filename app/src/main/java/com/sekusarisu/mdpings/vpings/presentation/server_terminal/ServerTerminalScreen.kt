@@ -448,7 +448,11 @@ fun TerminalKey(
             containerColor = if (isPressed)
                 MaterialTheme.colorScheme.primary
             else
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = if (isPressed)
+                MaterialTheme.colorScheme.onPrimary
+            else
+                MaterialTheme.colorScheme.onSurface
         ),
         shape = RoundedCornerShape(4.dp),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 4.dp, vertical = 4.dp)
