@@ -26,7 +26,7 @@ MDPings 是一个基于哪吒监控 API 接口开发的 MD3 风格 Android 客�
 </p>
 
 <p style="text-align: center;">
-    <img alt="desktop" src="snapshots/Screenshot_Terminal_Night.png" width="360"> <img alt="desktop" src="snapshots/Screenshot_Visual_Light.png" width="360">
+    <img alt="desktop" src="snapshots/Screenshot_Terminal_Night1.png" width="360"> <img alt="desktop" src="snapshots/Screenshot_Visual_Light.png" width="360">
 </p>
 
 ## Features

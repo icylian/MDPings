@@ -214,7 +214,7 @@ fun LoginScreen(
         } else {
             Column(
                 modifier = Modifier
-                    .padding(top = innerPadding.calculateTopPadding() - 4.dp)
+                    .padding(top = (innerPadding.calculateTopPadding() - 4.dp).coerceAtLeast(0.dp))
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
